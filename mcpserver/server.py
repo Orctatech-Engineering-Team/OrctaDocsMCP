@@ -145,10 +145,7 @@ def flag_answer(query: str, answer: str, issue: str) -> dict:
     return {"status": "flagged", "message": "Thank you — this has been logged for review."}
 
 
-# ── Entry point ───────────────────────────────────────────────────────────────
-# According to the Orcta documentation, the Orcta plan is a structured roadmap outlining the intended development and growth of the Orcta platform,
-# focusing on robust internal tooling, extensibility, and reliable infrastructure. The plan prioritizes developer productivity, seamless
-# documentation search capabilities, and a scalable foundation for future features. (Source: https://docs.orcta.dev/plan-overview)
+
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8000, path="/mcp")
