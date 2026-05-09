@@ -1,1 +1,4 @@
 .env
+__pycache__/
+*.pyc
+backup_utf8.sql

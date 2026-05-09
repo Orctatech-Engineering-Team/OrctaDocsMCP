@@ -6,35 +6,47 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: docs
     ports:
-      - "5433:5432"
+      - 5433:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d docs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   valkey:
     image: valkey/valkey:latest
     restart: always
     ports:
-      - "6379:6379"
+      - 6379:6379
 
   mcp:
     build: .
     restart: always
-    ports:
-      - "8000:8000"   # MCP server
-      - "8001:8001"   # health check
     env_file:
       - .env
+    environment:
+      POSTGRES_URL: postgresql://postgres:postgres@127.0.0.1:5433/docs
+      VALKEY_HOST: 127.0.0.1
+      OLLAMA_URL: http://127.0.0.1:11434
+    network_mode: host
     depends_on:
-      - postgres
-      - valkey
-    command: python -m mcp.server
+      postgres:
+        condition: service_started
+      valkey:
+        condition: service_started
+    command: python -m mcpserver.server
 
   ingest:
     build: .
     env_file:
       - .env
-    depends_on:
-      - postgres
+    environment:
+      POSTGRES_URL: postgresql://postgres:postgres@127.0.0.1:5433/docs
+      VALKEY_HOST: 127.0.0.1
+      OLLAMA_URL: http://127.0.0.1:11434
+    network_mode: host
     profiles:
       - ingest
     command: python -m ingestion.ingest
